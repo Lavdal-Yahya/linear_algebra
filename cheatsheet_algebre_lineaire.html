@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheatsheet – Algèbre Linéaire & Réduction</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0b0e1a;
+    --panel: #111527;
+    --panel2: #161b2e;
+    --border: #1e2640;
+    --accent1: #4f8ef7;
+    --accent2: #7c5cfc;
+    --accent3: #f7c948;
+    --accent4: #3ecfa3;
+    --accent5: #f76c6c;
+    --text: #dce4f5;
+    --muted: #7a88aa;
+    --mono: 'IBM Plex Mono', monospace;
+    --head: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13.5px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0d1230 0%, #1a1040 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px 22px;
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-family: var(--head);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  header .sub {
+    color: var(--muted);
+    font-size: 12px;
+    font-family: var(--mono);
+    margin-bottom: 2px;
+  }
+  .tabs {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { border-color: var(--accent1); color: var(--accent1); }
+  .tab-btn.active {
+    background: var(--accent1);
+    border-color: var(--accent1);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* ── LAYOUT ── */
+  main {
+    padding: 28px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+  .col-span2 { grid-column: span 2; }
+  .col-span3 { grid-column: span 3; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #2e3a58; }
+
+  .card-title {
+    font-family: var(--head);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .c1 { background: var(--accent1); }
+  .c2 { background: var(--accent2); }
+  .c3 { background: var(--accent3); }
+  .c4 { background: var(--accent4); }
+  .c5 { background: var(--accent5); }
+
+  /* ── FORMULA BOXES ── */
+  .formula {
+    background: var(--panel2);
+    border-left: 3px solid var(--accent1);
+    border-radius: 0 6px 6px 0;
+    padding: 9px 13px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #a8c4ff;
+    margin: 6px 0;
+    line-height: 1.8;
+  }
+  .formula.green { border-color: var(--accent4); color: #7efcd8; }
+  .formula.yellow { border-color: var(--accent3); color: #fde68a; }
+  .formula.red { border-color: var(--accent5); color: #fca5a5; }
+  .formula.purple { border-color: var(--accent2); color: #c4b5fd; }
+
+  /* ── STEPS ── */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex;
+    gap: 12px;
+    margin: 8px 0;
+    align-items: flex-start;
+  }
+  .step-num {
+    counter-increment: step;
+    content: counter(step);
+    min-width: 22px;
+    height: 22px;
+    background: var(--accent2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-num.blue { background: var(--accent1); }
+  .step-num.green { background: var(--accent4); color: #0b1a14; }
+  .step-num.yellow { background: var(--accent3); color: #1a0f00; }
+  .step-num.red { background: var(--accent5); }
+
+  .step-text { color: var(--text); font-size: 13px; }
+  .step-text b { color: var(--accent3); font-weight: 600; }
+  .step-text em { color: var(--accent4); font-style: normal; }
+  .step-text .warn { color: var(--accent5); font-weight: 600; }
+
+  /* ── PILLS / TAGS ── */
+  .tag {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 12px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    margin: 2px 2px;
+  }
+  .tag-blue { background: #1a3060; color: var(--accent1); border: 1px solid #2a4580; }
+  .tag-green { background: #0e2a20; color: var(--accent4); border: 1px solid #1a4030; }
+  .tag-yellow { background: #2a1e00; color: var(--accent3); border: 1px solid #4a3500; }
+  .tag-red { background: #2a0f0f; color: var(--accent5); border: 1px solid #4a1a1a; }
+  .tag-purple { background: #1e1040; color: var(--accent2); border: 1px solid #3a2060; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th {
+    background: #161b2e;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #181d30;
+    vertical-align: top;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: #c0cdea;
+  }
+  tr:hover td { background: #13182a; }
+  td.hl { color: var(--accent3); font-weight: 600; }
+
+  /* ── MISC ── */
+  .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 5px;
+  }
+  .note {
+    background: #161b2e;
+    border: 1px solid #252d47;
+    border-radius: 6px;
+    padding: 9px 13px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+  .note b { color: var(--accent3); }
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+  p { color: var(--text); font-size: 13px; line-height: 1.7; margin: 5px 0; }
+  p b { color: var(--accent3); }
+  p em { color: var(--accent4); font-style: normal; }
+  .section-title {
+    font-family: var(--head);
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::before {
+    content: '';
+    width: 4px; height: 22px;
+    background: linear-gradient(var(--accent1), var(--accent2));
+    border-radius: 2px;
+  }
+
+  /* Flash card hover */
+  .flip-hint { font-size: 10px; color: var(--muted); font-family: var(--mono); margin-top: 10px; }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .col-span2, .col-span3 { grid-column: span 1; }
+    header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .tabs { margin-left: 0; }
+    main { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="sub">Master DEML · 2024-2025</div>
+    <h1>Algèbre Linéaire &amp; Réduction</h1>
+  </div>
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="show('sev')">SEV &amp; Applications</button>
+    <button class="tab-btn" onclick="show('diag')">Diagonalisation</button>
+    <button class="tab-btn" onclick="show('jordan')">Jordan &amp; Nilpotence</button>
+    <button class="tab-btn" onclick="show('formules')">Formules clés</button>
+    <button class="tab-btn" onclick="show('methodes')">Méthodes pas-à-pas</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 1 — SEV & APPLICATIONS LINÉAIRES -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="sev" class="section visible">
+  <div class="section-title">Sous-espaces vectoriels &amp; Applications linéaires</div>
+
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-title"><span class="dot c1"></span>Prouver qu'un ensemble est un SEV</div>
+      <div class="steps">
+        <div class="step"><div class="step-num blue">1</div><div class="step-text"><b>Vecteur nul</b> — vérifier que 0 ∈ F.</div></div>
+        <div class="step"><div class="step-num blue">2</div><div class="step-text"><b>Stabilité additive</b> — si u, v ∈ F alors u+v ∈ F.</div></div>
+        <div class="step"><div class="step-num blue">3</div><div class="step-text"><b>Stabilité scalaire</b> — si u ∈ F et λ ∈ 𝕂 alors λu ∈ F.</div></div>
+      </div>
+      <div class="note">💡 <b>Raccourci :</b> si F = ker(φ) pour une app. linéaire φ, c'est <b>automatiquement</b> un SEV. Si F = Vect{v₁,...,vₖ}, c'est aussi un SEV.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c2"></span>Prouver qu'une application est linéaire</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Vérifier <b>f(u + λv) = f(u) + λf(v)</b> pour tous u, v et λ ∈ 𝕂.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Ou séparément : <b>additivité</b> f(u+v)=f(u)+f(v) + <b>homogénéité</b> f(λu)=λf(u).</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="label">Noyau</div>
+      <div class="formula">ker(f) = { x ∈ E | f(x) = 0 }</div>
+      <div class="label" style="margin-top:8px">Image</div>
+      <div class="formula green">Im(f) = { f(x) | x ∈ E } = f(E)</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c3"></span>Théorème du rang (fondamental !)</div>
+      <div class="formula yellow" style="font-size:14px; padding:13px 16px;">
+        dim(E) = dim(ker f) + dim(Im f)
+      </div>
+      <div class="formula yellow">
+        dim(E) = dim(ker f) + rg(f)
+      </div>
+      <div class="note" style="margin-top:12px">
+        <b>Utilisation typique :</b> si on connaît dim(Im f), on en déduit dim(ker f) = dim(E) − rg(f), et inversement.
+      </div>
+      <div class="divider"></div>
+      <table>
+        <tr><th>Propriété</th><th>Condition</th></tr>
+        <tr><td>Injectivité</td><td class="hl">ker(f) = {0}</td></tr>
+        <tr><td>Surjectivité</td><td class="hl">Im(f) = F</td></tr>
+        <tr><td>Bijectivité</td><td class="hl">injectif ET surjectif</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c4"></span>Dimension d'un SEV donné par équations</div>
+      <p>Un SEV défini par <b>p équations linéaires indépendantes</b> dans 𝕂ⁿ a pour dimension :</p>
+      <div class="formula green">dim F = n − rang(système d'équations)</div>
+      <div class="divider"></div>
+      <div class="label">Exemples types</div>
+      <div class="step" style="margin:6px 0"><div class="step-num green">▸</div><div class="step-text">1 équation dans R³ → dim = 3−1 = <b>2</b> (plan)</div></div>
+      <div class="step" style="margin:6px 0"><div class="step-num green">▸</div><div class="step-text">2 équations indép. dans R³ → dim = 3−2 = <b>1</b> (droite)</div></div>
+      <div class="step" style="margin:6px 0"><div class="step-num green">▸</div><div class="step-text">F ∩ G : combiner les équations des deux SEV</div></div>
+    </div>
+
+    <div class="card col-span2">
+      <div class="card-title"><span class="dot c5"></span>Dimensions remarquables dans Mₙ(R)</div>
+      <div class="grid-3" style="gap:10px; margin-top:4px">
+        <div>
+          <div class="label">Toutes matrices</div>
+          <div class="formula red">dim Mₙ(R) = n²</div>
+        </div>
+        <div>
+          <div class="label">Matrices diagonales</div>
+          <div class="formula red">dim Dₙ(R) = n</div>
+        </div>
+        <div>
+          <div class="label">Matrices symétriques</div>
+          <div class="formula red">dim Sₙ(R) = n(n+1)/2</div>
+        </div>
+        <div>
+          <div class="label">Matrices anti-symétriques</div>
+          <div class="formula red">dim Aₙ(R) = n(n-1)/2</div>
+        </div>
+        <div>
+          <div class="label">Matrices triangulaires sup.</div>
+          <div class="formula red">dim Tₙ⁺(R) = n(n+1)/2</div>
+        </div>
+        <div>
+          <div class="label">Vérification</div>
+          <div class="formula red">Sₙ + Aₙ = n² ✓</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 2 — DIAGONALISATION -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="diag" class="section">
+  <div class="section-title">Diagonalisation</div>
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-title"><span class="dot c1"></span>Étapes pour diagonaliser A (n×n)</div>
+      <div class="steps">
+        <div class="step"><div class="step-num blue">1</div><div class="step-text"><b>Polynôme caractéristique :</b> calculer χ_A(λ) = det(A−λI)</div></div>
+        <div class="step"><div class="step-num blue">2</div><div class="step-text"><b>Valeurs propres :</b> résoudre χ_A(λ) = 0 → λ₁,...,λₖ avec multiplicités algébriques m₁,...,mₖ</div></div>
+        <div class="step"><div class="step-num blue">3</div><div class="step-text"><b>Sous-espaces propres :</b> pour chaque λᵢ, calculer Eᵢ = ker(A−λᵢI) et sa dimension dᵢ</div></div>
+        <div class="step"><div class="step-num blue">4</div><div class="step-text"><b>Test :</b> A diagonalisable ⟺ <em>dᵢ = mᵢ pour tout i</em></div></div>
+        <div class="step"><div class="step-num blue">5</div><div class="step-text"><b>Matrice P :</b> colonnes = vecteurs propres (base de chaque Eᵢ)</div></div>
+        <div class="step"><div class="step-num blue">6</div><div class="step-text"><b>Matrice D :</b> diag(λ₁,...,λ₁,λ₂,...,λₙ) avec chaque λᵢ répété dᵢ fois</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c3"></span>Critères de diagonalisabilité</div>
+      <div class="label">Conditions SUFFISANTES (pas besoin de vérifier plus)</div>
+      <div class="step" style="margin:7px 0"><div class="step-num yellow">✓</div><div class="step-text">A a <b>n valeurs propres distinctes</b> dans 𝕂 → toujours diagonalisable</div></div>
+      <div class="step" style="margin:7px 0"><div class="step-num yellow">✓</div><div class="step-text">A est <b>symétrique réelle</b> → diagonalisable dans R (théorème spectral)</div></div>
+      <div class="step" style="margin:7px 0"><div class="step-num yellow">✓</div><div class="step-text">A vérifie une relation <b>P(A)=0</b> avec P scindé à racines simples</div></div>
+      <div class="divider"></div>
+      <div class="label">Condition NÉCESSAIRE ET SUFFISANTE</div>
+      <div class="formula yellow">Pour tout λᵢ :  dim Eλᵢ = multiplicité algébrique de λᵢ</div>
+      <div class="note"><b>Équivalent :</b> dim(ker(A−λᵢI)) = ordre de λᵢ dans χ_A</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c2"></span>Relations fondamentales A = PDP⁻¹</div>
+      <div class="formula purple">D = P⁻¹AP   ⟺   A = PDP⁻¹</div>
+      <div class="formula purple">Aⁿ = PDⁿP⁻¹</div>
+      <div class="formula purple">Dⁿ = diag(λ₁ⁿ, λ₂ⁿ, ..., λₙⁿ)  ← facile !</div>
+      <div class="note" style="margin-top:10px">
+        <b>Changement de base :</b> si A est la matrice de f dans e et D dans e', alors P est la matrice de passage de e vers e' (colonnes = vecteurs de e' exprimés dans e).
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c4"></span>Polynôme minimal</div>
+      <div class="formula green">m_A = plus petit polynôme unitaire annulant A</div>
+      <div class="divider"></div>
+      <table>
+        <tr><th>Cas</th><th>Polynôme minimal</th></tr>
+        <tr><td>A diagonalisable, VP distinctes λ₁,...,λₖ</td><td class="hl">(λ−λ₁)···(λ−λₖ)</td></tr>
+        <tr><td>A diagonalisable quelconque</td><td class="hl">produit (λ−λᵢ) sans répétition</td></tr>
+        <tr><td>Bloc Jordan taille r pour λ</td><td class="hl">(λ−λ)ʳ dans m_A</td></tr>
+        <tr><td>A nilpotente d'ordre k</td><td class="hl">λᵏ</td></tr>
+      </table>
+      <div class="note" style="margin-top:8px"><b>m_A divise χ_A</b>  et  <b>χ_A divise (m_A)ⁿ</b></div>
+    </div>
+
+    <div class="card col-span2">
+      <div class="card-title"><span class="dot c5"></span>Tableau récapitulatif des cas</div>
+      <table>
+        <tr><th>Situation</th><th>dim Eλ vs m.alg.</th><th>Diagonalisable ?</th><th>Forme canonique</th></tr>
+        <tr><td>n VP distinctes</td><td class="hl">dim Eλᵢ = 1 = mᵢ</td><td style="color:var(--accent4)">OUI ✓</td><td>D = diag(λ₁,...,λₙ)</td></tr>
+        <tr><td>VP répétée, dim ok</td><td class="hl">dim Eλ = m.alg.</td><td style="color:var(--accent4)">OUI ✓</td><td>D diagonale</td></tr>
+        <tr><td>VP répétée, dim insuffisante</td><td class="hl">dim Eλ &lt; m.alg.</td><td style="color:var(--accent5)">NON ✗</td><td>Forme de Jordan J</td></tr>
+        <tr><td>Valeurs propres complexes (matrice réelle)</td><td>—</td><td style="color:var(--accent5)">Non dans R</td><td>Peut-être dans ℂ</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 3 — JORDAN & NILPOTENCE -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="jordan" class="section">
+  <div class="section-title">Forme de Jordan &amp; Matrices nilpotentes</div>
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-title"><span class="dot c5"></span>Matrices nilpotentes</div>
+      <p>N est <b>nilpotente d'ordre k</b> si Nᵏ = 0 et N^(k-1) ≠ 0.</p>
+      <div class="divider"></div>
+      <div class="label">Décomposition A = λI + N  (N nilpotente)</div>
+      <div class="formula red">Aⁿ = (λI + N)ⁿ = Σ C(n,k) λⁿ⁻ᵏ Nᵏ</div>
+      <div class="note"><b>La somme s'arrête à k−1</b> (car Nᵏ=0). Si N²=0 : Aⁿ = λⁿI + nλⁿ⁻¹N</div>
+      <div class="divider"></div>
+      <div class="label">Vérifier la nilpotence</div>
+      <div class="steps">
+        <div class="step"><div class="step-num red">1</div><div class="step-text">Calculer N², N³,... jusqu'à trouver Nᵏ = 0</div></div>
+        <div class="step"><div class="step-num red">2</div><div class="step-text">Ou : toutes les VP de N sont nulles ⟺ N nilpotente</div></div>
+        <div class="step"><div class="step-num red">3</div><div class="step-text">Ou : χ_N(λ) = (−1)ⁿλⁿ ⟺ N nilpotente</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c2"></span>Blocs de Jordan</div>
+      <p>Un <b>bloc de Jordan</b> de taille r pour la valeur propre λ est :</p>
+      <div class="formula purple">Jᵣ(λ) =  λ 1 0 ...
+             0 λ 1 ...
+             ...   λ 1
+             0 ... 0 λ</div>
+      <div class="note">Matrice λI + N où N est le décalage (shift) nilpotent d'ordre r.</div>
+      <div class="divider"></div>
+      <div class="label">Puissance d'un bloc de Jordan</div>
+      <div class="formula purple">Jᵣ(λ)ⁿ = Σₖ C(n,k) λⁿ⁻ᵏ Nᵏ  (N^r=0)</div>
+      <div class="note"><b>Entrée (i,j) de Jᵣ(λ)ⁿ :</b> C(n, j-i)·λⁿ⁻⁽ʲ⁻ⁱ⁾ si j≥i, 0 sinon</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c3"></span>Trouver une chaîne de Jordan</div>
+      <p>Pour une VP λ avec dim Eλ &lt; m.alg., construire une chaîne :</p>
+      <div class="steps">
+        <div class="step"><div class="step-num yellow">1</div><div class="step-text">Trouver <b>u ∈ ker(A−λI)</b> (vecteur propre)</div></div>
+        <div class="step"><div class="step-num yellow">2</div><div class="step-text">Résoudre <b>(A−λI)v = u</b> → v est vecteur propre généralisé</div></div>
+        <div class="step"><div class="step-num yellow">3</div><div class="step-text">Résoudre <b>(A−λI)w = v</b> → w est vecteur propre généralisé d'ordre 3</div></div>
+        <div class="step"><div class="step-num yellow">4</div><div class="step-text">Continuer jusqu'à remplir le sous-espace caractéristique</div></div>
+      </div>
+      <div class="formula yellow">f(u)=λu,  f(v)=λv+u,  f(w)=λw+v</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c4"></span>Sous-espaces propres vs caractéristiques</div>
+      <table>
+        <tr><th>Nom</th><th>Définition</th><th>Dimension</th></tr>
+        <tr><td>Sous-espace propre Eλ</td><td class="hl">ker(A−λI)</td><td>= dim géométrique</td></tr>
+        <tr><td>Sous-espace caract. Fλ</td><td class="hl">ker(A−λI)ᵐ</td><td>= mult. algébrique</td></tr>
+      </table>
+      <div class="note" style="margin-top:8px">
+        <b>Toujours :</b> dim Eλ ≤ mult. algébrique de λ<br>
+        <b>Diagonalisable ⟺</b> dim Eλ = mult. algébrique pour tout λ<br>
+        <b>Non diagonalisable :</b> Fλ ≠ Eλ pour au moins un λ
+      </div>
+    </div>
+
+    <div class="card col-span2">
+      <div class="card-title"><span class="dot c1"></span>Cas pratiques — Formes de Jordan 3×3</div>
+      <div class="grid-3" style="gap:10px; margin-top:4px">
+        <div>
+          <div class="label">3 VP distinctes → diag.</div>
+          <div class="formula">J = diag(λ₁,λ₂,λ₃)</div>
+          <div class="tag tag-green">Diagonalisable</div>
+        </div>
+        <div>
+          <div class="label">VP double, dim=2</div>
+          <div class="formula">J = diag(λ,λ,μ)</div>
+          <div class="tag tag-green">Diagonalisable</div>
+        </div>
+        <div>
+          <div class="label">VP double, dim=1</div>
+          <div class="formula">J = [[λ,1,0],[0,λ,0],[0,0,μ]]</div>
+          <div class="tag tag-red">Jordan 2+1</div>
+        </div>
+        <div>
+          <div class="label">VP triple, dim=3</div>
+          <div class="formula">J = diag(λ,λ,λ) = λI</div>
+          <div class="tag tag-green">Diagonalisable</div>
+        </div>
+        <div>
+          <div class="label">VP triple, dim=2</div>
+          <div class="formula">J = [[λ,1,0],[0,λ,0],[0,0,λ]]</div>
+          <div class="tag tag-red">Jordan 2+1</div>
+        </div>
+        <div>
+          <div class="label">VP triple, dim=1</div>
+          <div class="formula">J = [[λ,1,0],[0,λ,1],[0,0,λ]]</div>
+          <div class="tag tag-red">Jordan 3</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 4 — FORMULES CLÉS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="formules" class="section">
+  <div class="section-title">Formules clés à mémoriser</div>
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title"><span class="dot c1"></span>Polynôme caractéristique</div>
+      <div class="formula">χ_A(λ) = det(A − λI)</div>
+      <div class="note" style="margin-top:8px">
+        <b>Propriétés :</b><br>
+        • χ_A(λ) est de degré n<br>
+        • χ_A(A) = 0  (Cayley-Hamilton)<br>
+        • Coefficient de λⁿ : (−1)ⁿ<br>
+        • Terme constant : det(A)<br>
+        • Coefficient de λⁿ⁻¹ : (−1)ⁿ⁻¹ tr(A)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c3"></span>Trace &amp; Déterminant</div>
+      <div class="formula yellow">tr(A) = Σλᵢ = somme des VP</div>
+      <div class="formula yellow">det(A) = Πλᵢ = produit des VP</div>
+      <div class="divider"></div>
+      <p>A inversible ⟺ det(A) ≠ 0 ⟺ 0 n'est pas VP de A</p>
+      <div class="formula yellow" style="margin-top:8px">Si A = PDP⁻¹ :  det(A)=det(D)=Πλᵢ</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c4"></span>Changement de base</div>
+      <div class="formula green">D = P⁻¹AP</div>
+      <div class="formula green">A = PDP⁻¹</div>
+      <div class="formula green">Aⁿ = PDⁿP⁻¹</div>
+      <div class="formula green">f(Aⁿ) = P·f(D)·P⁻¹  (pour tout pol. f)</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c2"></span>Inverse d'une matrice 2×2</div>
+      <div class="formula purple">Si A = [[a,b],[c,d]] :</div>
+      <div class="formula purple">A⁻¹ = (1/det(A)) · [[d,-b],[-c,a]]</div>
+      <div class="formula purple">det(A) = ad − bc</div>
+      <div class="note" style="margin-top:8px">Pour 3×3 : méthode des cofacteurs ou Gauss-Jordan sur [A|I]</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c5"></span>Binôme de matrices qui commutent</div>
+      <div class="formula red">(A+B)ⁿ = Σ C(n,k) AⁿBᵏ  si AB=BA</div>
+      <div class="note" style="margin-top:8px">
+        <b>Cas λI + N :</b> λI et N commutent toujours, donc :<br>
+      </div>
+      <div class="formula red">(λI+N)ⁿ = Σₖ C(n,k)λⁿ⁻ᵏNᵏ</div>
+      <div class="note"><b>Attention :</b> si AB ≠ BA, le binôme ne s'applique pas !</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c1"></span>Suites récurrentes linéaires</div>
+      <p>Pour u_{n+2} = α·u_{n+1} + β·uₙ :</p>
+      <div class="formula">A = [[0,1],[-β, α]]  (matrice compagnon)</div>
+      <div class="formula">Uₙ = Aⁿ·U₀  où  Uₙ = (uₙ, u_{n+1})ᵀ</div>
+      <div class="note" style="margin-top:8px">
+        Les <b>valeurs propres de A</b> = racines de l'équation caractéristique r²−αr−β=0<br>
+        Si r₁ ≠ r₂ : uₙ = A·r₁ⁿ + B·r₂ⁿ
+      </div>
+    </div>
+
+    <div class="card col-span3">
+      <div class="card-title"><span class="dot c3"></span>Méthodes pour calculer det(A − λI) : récapitulatif selon la taille</div>
+      <div class="grid-3" style="gap:10px; margin-top:4px">
+        <div>
+          <div class="label">Matrice 2×2</div>
+          <div class="formula yellow">det[[a-λ,b],[c,d-λ]] = λ²-(a+d)λ+(ad-bc)</div>
+          <p style="font-size:11px; color:var(--muted); margin-top:4px">Discriminant Δ = (a-d)²+4bc</p>
+        </div>
+        <div>
+          <div class="label">Matrice 3×3 — astuces</div>
+          <div class="steps" style="margin-top:0">
+            <div class="step"><div class="step-num yellow" style="font-size:9px">▸</div><div class="step-text" style="font-size:11px">Développer selon ligne/colonne avec max de zéros</div></div>
+            <div class="step"><div class="step-num yellow" style="font-size:9px">▸</div><div class="step-text" style="font-size:11px">Chercher racine évidente (±1, ±2...) puis factoriser</div></div>
+            <div class="step"><div class="step-num yellow" style="font-size:9px">▸</div><div class="step-text" style="font-size:11px">Utiliser tr(A) et det(A) comme vérification</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="label">Matrice triangulaire</div>
+          <div class="formula yellow">det = produit des éléments diagonaux</div>
+          <div class="note" style="margin-top:6px; font-size:11px">Valeurs propres = éléments diagonaux (avec leurs multiplicités)</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TAB 5 — MÉTHODES PAS À PAS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="methodes" class="section">
+  <div class="section-title">Méthodes pas-à-pas</div>
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-title"><span class="dot c1"></span>Méthode : Inverser une matrice 3×3</div>
+      <div class="steps">
+        <div class="step"><div class="step-num blue">1</div><div class="step-text">Former la matrice augmentée <b>[A | I₃]</b></div></div>
+        <div class="step"><div class="step-num blue">2</div><div class="step-text">Appliquer des <b>opérations élémentaires sur les lignes</b> pour transformer A en I₃</div></div>
+        <div class="step"><div class="step-num blue">3</div><div class="step-text">Le côté droit devient <b>A⁻¹</b></div></div>
+        <div class="step"><div class="step-num blue">4</div><div class="step-text"><b>Vérifier</b> : A·A⁻¹ = I₃</div></div>
+      </div>
+      <div class="note" style="margin-top:10px"><b>Alternative (cofacteurs) :</b> A⁻¹ = (1/det A) · com(A)ᵀ où com(A)ᵢⱼ = (−1)^(i+j)·Mᵢⱼ</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c4"></span>Méthode : Calculer Aⁿ (cas diagonalisable)</div>
+      <div class="steps">
+        <div class="step"><div class="step-num green">1</div><div class="step-text">Diagonaliser : trouver P et D tels que <b>A = PDP⁻¹</b></div></div>
+        <div class="step"><div class="step-num green">2</div><div class="step-text">Calculer <b>Dⁿ = diag(λ₁ⁿ,...,λₖⁿ)</b> directement</div></div>
+        <div class="step"><div class="step-num green">3</div><div class="step-text">Calculer <b>P⁻¹</b></div></div>
+        <div class="step"><div class="step-num green">4</div><div class="step-text">Aⁿ = <b>P · Dⁿ · P⁻¹</b></div></div>
+      </div>
+      <div class="note" style="margin-top:10px"><b>Cas non diagonalisable :</b> A = λI+N, utiliser le binôme (N nilpotente)</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c2"></span>Méthode : Trouver les vecteurs propres</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Former la matrice <b>(A − λI)</b> pour la valeur propre λ</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Appliquer <b>pivot de Gauss</b> sur (A−λI) sans pivoter en 0</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Identifier les <b>variables libres</b> (autant que dim Eλ)</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text">Exprimer toutes les variables en fonction des variables libres</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text">Obtenir une <b>base de Eλ</b> : un vecteur par variable libre</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c3"></span>Méthode : Prouver non-diagonalisabilité</div>
+      <div class="steps">
+        <div class="step"><div class="step-num yellow">1</div><div class="step-text">Calculer χ_A(λ) et trouver une VP <b>λ₀ de multiplicité m ≥ 2</b></div></div>
+        <div class="step"><div class="step-num yellow">2</div><div class="step-text">Calculer le <b>rang de (A−λ₀I)</b></div></div>
+        <div class="step"><div class="step-num yellow">3</div><div class="step-text">dim Eλ₀ = n − rang(A−λ₀I)</div></div>
+        <div class="step"><div class="step-num yellow">4</div><div class="step-text">Si <b>dim Eλ₀ &lt; m</b> → <span class="warn">A n'est pas diagonalisable</span></div></div>
+      </div>
+      <div class="note" style="margin-top:10px">La matrice A est alors trigonalisable (forme de Jordan) mais pas diagonalisable.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c5"></span>Méthode : Prouver qu'une suite tend vers √k</div>
+      <div class="steps">
+        <div class="step"><div class="step-num red">1</div><div class="step-text">Exprimer le système comme <b>Uₙ = Aⁿ·U₀</b></div></div>
+        <div class="step"><div class="step-num red">2</div><div class="step-text">Diagonaliser A → valeurs propres ω₁ &gt; ω₂ en module</div></div>
+        <div class="step"><div class="step-num red">3</div><div class="step-text">Écrire <b>Aⁿx = θω₁ⁿε₁ + ϖω₂ⁿε₂</b> (décomposition propre)</div></div>
+        <div class="step"><div class="step-num red">4</div><div class="step-text">Diviser bₙ/aₙ, factoriser par ω₁ⁿ → le terme ω₂ⁿ/ω₁ⁿ → 0</div></div>
+        <div class="step"><div class="step-num red">5</div><div class="step-text">La limite est donnée par le <b>rapport des composantes de ε₁</b></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot c1"></span>Méthode : Montrer A inversible via une relation polynomiale</div>
+      <p>Si on connaît P(A) = 0 pour un polynôme P, chercher à isoler I :</p>
+      <div class="formula" style="margin-top:10px">Exemple : A² = A + 2I</div>
+      <div class="formula">⟹ A² − A = 2I</div>
+      <div class="formula">⟹ A(A − I) = 2I</div>
+      <div class="formula">⟹ A · ½(A−I) = I</div>
+      <div class="formula green">⟹ A⁻¹ = ½(A − I) ✓</div>
+      <div class="note" style="margin-top:8px"><b>Principe général :</b> si aₖAᵏ + ... + a₁A + a₀I = 0 avec a₀ ≠ 0, alors A est inversible et A⁻¹ = −(1/a₀)(aₖAᵏ⁻¹+...+a₁I)</div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  event.target.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>
